@@ -10,6 +10,7 @@ import Products from './components/pages/Products';
 import Analytics from './components/pages/Analytics';
 import Messages from './components/pages/Messages';
 import Settings from './components/pages/Settings';
+import Projects from './components/pages/Projects';
 import { ViewName } from './types';
 
 // Data summary to pass to AI context
@@ -34,6 +35,7 @@ const Layout = () => {
       case 'Analytics': return <Analytics />;
       case 'Messages': return <Messages />;
       case 'Settings': return <Settings />;
+      case 'Projects': return <Projects />;
       default: return <DashboardHome onOpenAI={() => setAiOpen(true)} />;
     }
   };

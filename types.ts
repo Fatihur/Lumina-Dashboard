@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 
-export type ViewName = 'Dashboard' | 'Customers' | 'Products' | 'Analytics' | 'Messages' | 'Settings';
+export type ViewName = 'Dashboard' | 'Customers' | 'Products' | 'Analytics' | 'Messages' | 'Settings' | 'Projects';
 
 export interface NavItem {
   label: ViewName;

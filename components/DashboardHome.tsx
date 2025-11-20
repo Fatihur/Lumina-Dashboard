@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell
@@ -52,6 +52,50 @@ interface DashboardHomeProps {
 
 const DashboardHome: React.FC<DashboardHomeProps> = ({ onOpenAI }) => {
   const [timeRange, setTimeRange] = useState('7d');
+  
+  // State for live statistics
+  const [stats, setStats] = useState({
+    revenue: 45231.89,
+    users: 2345,
+    orders: 12543,
+    bounceRate: 42.3
+  });
+
+  // Simulate live data updates
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setStats(prev => {
+        // Randomly decide which stat to update to simulate real activity
+        const choice = Math.random();
+        const newStats = { ...prev };
+
+        if (choice < 0.4) {
+          // Update Revenue
+          newStats.revenue = prev.revenue + (Math.random() * 200 - 50);
+        } 
+        
+        if (choice > 0.2 && choice < 0.6) {
+          // Update Users
+          newStats.users = Math.floor(prev.users + (Math.random() * 10 - 2));
+        }
+
+        if (choice > 0.5 && choice < 0.8) {
+          // Update Orders
+          newStats.orders = Math.floor(prev.orders + (Math.random() * 5 - 1));
+        }
+
+        if (choice > 0.8) {
+          // Update Bounce Rate
+          const change = (Math.random() * 1 - 0.5);
+          newStats.bounceRate = parseFloat((prev.bounceRate + change).toFixed(1));
+        }
+
+        return newStats;
+      });
+    }, 3000); // Update every 3 seconds
+
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <div className="space-y-6 md:space-y-8 animate-fade-in">
@@ -107,7 +151,7 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ onOpenAI }) => {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
         <StatCard 
           title="Total Revenue" 
-          value="$45,231.89" 
+          value={`$${stats.revenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`} 
           change={20.1} 
           trend="up" 
           icon={<DollarSign />}
@@ -116,7 +160,7 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ onOpenAI }) => {
         />
         <StatCard 
           title="Active Users" 
-          value="2,345" 
+          value={stats.users.toLocaleString()} 
           change={15.2} 
           trend="up" 
           icon={<Users />} 
@@ -125,7 +169,7 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ onOpenAI }) => {
         />
         <StatCard 
           title="Total Orders" 
-          value="12,543" 
+          value={stats.orders.toLocaleString()} 
           change={-4.5} 
           trend="down" 
           icon={<ShoppingCart />} 
@@ -134,7 +178,7 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ onOpenAI }) => {
         />
         <StatCard 
           title="Bounce Rate" 
-          value="42.3%" 
+          value={`${stats.bounceRate.toFixed(1)}%`} 
           change={0.0} 
           trend="neutral" 
           icon={<Activity />} 

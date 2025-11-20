@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { ArrowUpRight, ArrowDownRight, Minus } from 'lucide-react';
 import { AreaChart, Area, ResponsiveContainer } from 'recharts';
 import { StatCardProps } from '../types';
@@ -8,6 +8,20 @@ import { Badge } from './ui/Badge';
 const StatCard: React.FC<StatCardProps> = ({ title, value, change, icon, trend, chartData, chartColor = "hsl(var(--primary))" }) => {
   const isPositive = trend === 'up';
   const isNegative = trend === 'down';
+
+  // Animation state for value updates
+  const [highlight, setHighlight] = useState(false);
+  const prevValueRef = useRef(value);
+
+  useEffect(() => {
+    if (prevValueRef.current !== value) {
+      setHighlight(true);
+      // Remove highlight after animation duration
+      const timer = setTimeout(() => setHighlight(false), 1000);
+      prevValueRef.current = value;
+      return () => clearTimeout(timer);
+    }
+  }, [value]);
 
   return (
     <Card className="relative overflow-hidden transition-all hover:shadow-md hover:border-primary/20 group">
@@ -24,7 +38,13 @@ const StatCard: React.FC<StatCardProps> = ({ title, value, change, icon, trend, 
       <CardContent>
         <div className="flex items-end justify-between">
           <div>
-            <div className="text-2xl font-bold tracking-tight">{value}</div>
+            <div 
+              className={`text-2xl font-bold tracking-tight transition-all duration-500 ease-out ${
+                highlight ? 'text-primary scale-105 origin-left' : 'text-foreground scale-100 origin-left'
+              }`}
+            >
+              {value}
+            </div>
             <div className="flex items-center mt-1 text-xs font-medium">
               <Badge 
                 variant={isPositive ? 'success' : isNegative ? 'destructive' : 'secondary'}

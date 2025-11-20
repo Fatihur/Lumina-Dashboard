@@ -9,7 +9,8 @@ import {
   MessageSquare, 
   LogOut,
   X,
-  ChevronRight
+  ChevronRight,
+  FolderKanban
 } from 'lucide-react';
 import { NavItem, ViewName } from '../types';
 
@@ -22,6 +23,7 @@ interface SidebarProps {
 
 const navItems: NavItem[] = [
   { label: 'Dashboard', icon: <LayoutDashboard size={20} /> },
+  { label: 'Projects', icon: <FolderKanban size={20} /> },
   { label: 'Customers', icon: <Users size={20} />, badge: 12 },
   { label: 'Products', icon: <ShoppingBag size={20} /> },
   { label: 'Analytics', icon: <PieChart size={20} /> },
