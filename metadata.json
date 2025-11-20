@@ -1,0 +1,5 @@
+{
+  "name": "Lumina Admin",
+  "description": "A premium, responsive React Admin Dashboard featuring dark mode, data visualization with Recharts, and a built-in Gemini AI smart assistant for business insights.",
+  "requestFramePermissions": []
+}
