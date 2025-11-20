@@ -61,40 +61,51 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ onOpenAI }) => {
     bounceRate: 42.3
   });
 
+  // Calculate total traffic dynamically
+  const totalTraffic = trafficData.reduce((acc, curr) => acc + curr.value, 0);
+
   // Simulate live data updates
   useEffect(() => {
-    const interval = setInterval(() => {
-      setStats(prev => {
-        // Randomly decide which stat to update to simulate real activity
-        const choice = Math.random();
-        const newStats = { ...prev };
+    let timeoutId: ReturnType<typeof setTimeout>;
 
-        if (choice < 0.4) {
-          // Update Revenue
-          newStats.revenue = prev.revenue + (Math.random() * 200 - 50);
+    const updateStats = () => {
+      setStats(prev => {
+        const newStats = { ...prev };
+        
+        // Randomly update different metrics to feel organic
+        if (Math.random() > 0.3) {
+          // Update Revenue (small fluctuations)
+          newStats.revenue = prev.revenue + (Math.random() * 200 - 80);
         } 
         
-        if (choice > 0.2 && choice < 0.6) {
-          // Update Users
-          newStats.users = Math.floor(prev.users + (Math.random() * 10 - 2));
+        if (Math.random() > 0.4) {
+          // Update Users (integer changes)
+          newStats.users = Math.max(0, Math.floor(prev.users + (Math.random() * 10 - 3)));
         }
 
-        if (choice > 0.5 && choice < 0.8) {
+        if (Math.random() > 0.5) {
           // Update Orders
-          newStats.orders = Math.floor(prev.orders + (Math.random() * 5 - 1));
+          newStats.orders = Math.max(0, Math.floor(prev.orders + (Math.random() * 5 - 1)));
         }
 
-        if (choice > 0.8) {
-          // Update Bounce Rate
-          const change = (Math.random() * 1 - 0.5);
-          newStats.bounceRate = parseFloat((prev.bounceRate + change).toFixed(1));
+        if (Math.random() > 0.7) {
+          // Update Bounce Rate (rarely changes)
+          const change = (Math.random() * 0.4 - 0.2);
+          newStats.bounceRate = Math.max(0, Math.min(100, parseFloat((prev.bounceRate + change).toFixed(1))));
         }
 
         return newStats;
       });
-    }, 3000); // Update every 3 seconds
 
-    return () => clearInterval(interval);
+      // Schedule next update between 2s (2000ms) and 3s (3000ms)
+      const nextDelay = Math.floor(Math.random() * 1000) + 2000;
+      timeoutId = setTimeout(updateStats, nextDelay);
+    };
+
+    // Start the simulation
+    timeoutId = setTimeout(updateStats, 2000);
+
+    return () => clearTimeout(timeoutId);
   }, []);
 
   return (
@@ -274,43 +285,52 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ onOpenAI }) => {
             <CardDescription>Where your visitors are coming from.</CardDescription>
           </CardHeader>
           <CardContent className="flex-1 flex flex-col items-center justify-center relative p-6">
-            <div className="h-[250px] w-full">
+            {/* Added relative here to ensure the absolute center text is positioned relative to this container, not the parent CardContent */}
+            <div className="h-[250px] w-full relative">
                 <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                     <Pie
                     data={trafficData}
                     cx="50%"
                     cy="50%"
-                    innerRadius={60}
-                    outerRadius={80}
+                    innerRadius={65}
+                    outerRadius={85}
                     paddingAngle={5}
                     dataKey="value"
-                    stroke="none"
+                    stroke="hsl(var(--card))"
+                    strokeWidth={2}
                     >
                     {trafficData.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={entry.color} />
                     ))}
                     </Pie>
                     <Tooltip 
-                        contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                        contentStyle={{ 
+                            backgroundColor: 'hsl(var(--popover))', 
+                            borderColor: 'hsl(var(--border))', 
+                            color: 'hsl(var(--popover-foreground))',
+                            borderRadius: '8px', 
+                            boxShadow: '0 4px 12px rgba(0,0,0,0.1)' 
+                        }}
+                        itemStyle={{ color: 'hsl(var(--foreground))' }}
                     />
                 </PieChart>
                 </ResponsiveContainer>
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                    <div className="text-center">
-                        <span className="text-2xl font-bold block">12.5K</span>
-                        <span className="text-xs text-muted-foreground">Total Visits</span>
+                    <div className="text-center animate-fade-in">
+                        <span className="text-3xl font-bold block text-foreground">{(totalTraffic / 1000).toFixed(1)}K</span>
+                        <span className="text-xs text-muted-foreground font-medium uppercase tracking-wide">Total Visits</span>
                     </div>
                 </div>
             </div>
             <div className="w-full space-y-3 mt-4">
                 {trafficData.map((item) => (
-                    <div key={item.name} className="flex items-center justify-between text-sm">
+                    <div key={item.name} className="flex items-center justify-between text-sm group hover:bg-muted/50 p-1.5 rounded-md transition-colors cursor-default">
                         <div className="flex items-center gap-2">
-                            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }}></div>
-                            <span className="text-muted-foreground">{item.name}</span>
+                            <div className="w-3 h-3 rounded-full shadow-sm ring-2 ring-transparent group-hover:ring-border" style={{ backgroundColor: item.color }}></div>
+                            <span className="text-muted-foreground font-medium">{item.name}</span>
                         </div>
-                        <span className="font-medium">{Math.round((item.value / 1200) * 100)}%</span>
+                        <span className="font-bold text-foreground">{Math.round((item.value / totalTraffic) * 100)}%</span>
                     </div>
                 ))}
             </div>
